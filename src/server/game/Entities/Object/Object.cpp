@@ -2114,7 +2114,9 @@ void WorldObject::ResetMap()
 
 Map const* WorldObject::GetBaseMap() const
 {
-    ASSERT(m_currMap);
+    if (!m_currMap)
+        return nullptr;
+
     return m_currMap->GetParent();
 }
 
