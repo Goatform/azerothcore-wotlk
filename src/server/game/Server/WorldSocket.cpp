@@ -475,14 +475,22 @@ int WorldSocket::handle_input_header(void)
 
     if (!header.IsValidSize() || !header.IsValidOpcode())
     {
-        Player* _player        = m_Session ? m_Session->GetPlayer()                : nullptr;
-        const char* ip         = m_Session ? m_Session->GetRemoteAddress().c_str() : 0;
-        uint32 latency         = m_Session ? m_Session->GetLatency()               : 0;
-        uint32 accountId       = m_Session ? m_Session->GetAccountId()             : 0;
-        uint32 guidLow         = _player   ? _player->GetGUIDLow()                 : 0;
-        const char* playerName = _player   ? _player->GetName().c_str()            : "<none>";
+        Player* _player = m_Session ? m_Session->GetPlayer() : nullptr;
 
-        sLog->outError("WorldSocket::handle_input_header(): client (IP: %s, latency: %u, accountID: %u, character [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)", ip, latency, accountId, guidLow, playerName, header.size, header.cmd);
+        if (_player)
+        {
+            const char* ip         = m_Session ? m_Session->GetRemoteAddress().c_str() : 0;
+            uint32 accountId       = m_Session ? m_Session->GetAccountId()             : 0;
+            uint32 guidLow         = _player   ? _player->GetGUIDLow()                 : 0;
+            const char* playerName = _player   ? _player->GetName().c_str()            : "<none>";
+
+            sLog->outError("WorldSocket::handle_input_header(): client (IP: %s, account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)", ip, accountId, guidLow, playerName, header.size, header.cmd);
+        }
+        else
+        {
+            const char* ip = GetRemoteAddress().c_str();
+            sLog->outError("WorldSocket::handle_input_header(): client (IP: %s) sent malformed packet (size: %d, cmd: %d)", ip, header.size, header.cmd);
+        }
 
         errno = EINVAL;
         return -1;
