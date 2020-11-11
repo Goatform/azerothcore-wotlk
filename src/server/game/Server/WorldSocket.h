@@ -28,6 +28,7 @@
 #include "Common.h"
 #include "AuthCrypt.h"
 #include "Duration.h"
+#include "Opcodes.h"
 
 class ACE_Message_Block;
 class WorldPacket;
